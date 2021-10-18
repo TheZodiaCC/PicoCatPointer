@@ -31,19 +31,24 @@ class Pointer:
 
         self.running = not self.running
 
+    def get_direction_pwm(self, direction):
+        if direction == Config.DIRECTION_FORWARD:
+            pwm = random.randint(Config.FORWARD_SERVO_PWM_MIN, Config.FORWARD_SERVO_PWM_MAX)
+        else:
+            pwm = random.randint(Config.BACKWARD_SERVO_PWM_MIN, Config.BACKWARD_SERVO_PWM_MAX)
+
+        return pwm
+
     def move(self):
         if self.running:
-            speed = random.randint(1, Config.SERVO_MAX_SPEED)
-            direction = random.choice([-1, 1])
-            distance = random.randint(10, Config.HORIZONTAL_SERVO_MAX)
+            horizontal_pwm = self.get_direction_pwm(random.uniform(Config.DIRECTION_FORWARD, Config.DIRECTION_BACKWARD))
+            vertical_pwm = self.get_direction_pwm(random.uniform(Config.DIRECTION_FORWARD, Config.DIRECTION_BACKWARD))
 
-            if direction > 0:
-                for i in range(100, distance, speed):
-                    self.horizontal_servo.duty_u16(i)
-                    time.sleep(0.01)
-            else:
-                for i in range(distance, 0, -1 * speed):
-                    self.horizontal_servo.duty_u16(i)
-                    time.sleep(0.01)
+            wait = random.uniform(Config.SERVO_MIN_WAIT, Config.SERVO_MAX_WAIT)
+
+            self.horizontal_servo.duty_u16(horizontal_pwm)
+            self.vertical_servo.duty_u16(vertical_pwm)
+
+            time.sleep(wait)
 
             self.down_servos()
